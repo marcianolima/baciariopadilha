@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="stylesheet" href="css/leaflet.css">
+    <link rel="stylesheet" href="css/qgis2web.css">
+    <link rel="stylesheet" href="css/fontawesome-all.min.css">
+    <link rel="stylesheet" href="css/leaflet-search.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <style>
+        html,
+        body,
+        #container {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            font-family: Verdana, Arial, Helvetica, sans-serif;
+            font-size: 18px;
+        }
+        
+        body {
+            padding-top: 68px;
+        }
+        
+        #map {
+            height: 100%;
+            width: auto;
+            position: relative;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        .leaflet-control-layers-expanded {
+            width: 200px;
+            font-family: arial, sans-serif;
+            font-size: 14px;
+        }
+    </style>
+
+    <style>
+        * Change this breakpoint if you change the breakpoint of the navbar */ @media (min-width: 992px) {
+            .animate {
+                animation-duration: 0.3s;
+                -webkit-animation-duration: 0.3s;
+                animation-fill-mode: both;
+                -webkit-animation-fill-mode: both;
+            }
+        }
+        
+        @keyframes slideIn {
+            0% {
+                transform: translateY(1rem);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0rem);
+                opacity: 1;
+            }
+            0% {
+                transform: translateY(1rem);
+                opacity: 0;
+            }
+        }
+        
+        @-webkit-keyframes slideIn {
+            0% {
+                -webkit-transform: transform;
+                -webkit-opacity: 0;
+            }
+            100% {
+                -webkit-transform: translateY(0);
+                -webkit-opacity: 1;
+            }
+            0% {
+                -webkit-transform: translateY(1rem);
+                -webkit-opacity: 0;
+            }
+        }
+        
+        .slideIn {
+            -webkit-animation-name: slideIn;
+            animation-name: slideIn;
+        }
+        /* Other styles for the page not related to the animated dropdown */
+        
+        body {
+            background: #007bff;
+            background: linear-gradient(to right, #0062E6, #33AEFF);
+            font-family: arial, sans-serif;
+            font-size: 14px;
+        }
+        
+        table {
+            font-family: arial, sans-serif;
+            font-size: 14px;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        
+        caption {
+            background-color: #aeaeae;
+        }
+        
+        th {
+            border: 1px solid #dddddd;
+        }
+        
+        td {
+            border: 1px solid #dddddd;
+        }
+        
+        tr:nth-child(odd) {
+            background-color: #dddddd;
+        }
+    </style>
+
+
+    <title>Trabalho Grupo A</title>
+</head>
+
+<body>
+    <div id="map">
+    </div>
+    <script src="js/qgis2web_expressions.js"></script>
+    <script src="js/leaflet.js"></script>
+    <script src="js/leaflet.rotatedMarker.js"></script>
+    <script src="js/leaflet.pattern.js"></script>
+    <script src="js/leaflet-hash.js"></script>
+    <script src="js/Autolinker.min.js"></script>
+    <script src="js/rbush.min.js"></script>
+    <script src="js/labelgun.min.js"></script>
+    <script src="js/labels.js"></script>
+    <script src="js/leaflet-search.js"></script>
+    <script src="data/BaciadoRioPadilha_1.js"></script>
+    <script src="data/DivisadeBairros_2.js"></script>
+    <script src="data/readeOcpIrreg_3.js"></script>
+    <script src="data/AppRios30m_4.js"></script>
+    <script src="data/Rios_5.js"></script>
+    <script src="data/reasdeConflito_6.js"></script>
+
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+
+
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom fixed-top" style="margin-top: 0px;">
+        <div class="container">
+            <a class="navbar-brand mr-auto" href="#">Bacia do Rio Padilha</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Click aqui!
+                  </a>
+                        <!-- Here's the magic. Add the .animate and .slide-in classes to your .dropdown-menu and you're all set! -->
+                        <div class="dropdown-menu dropdown-menu-right animate slideIn" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="#">Ajuda</a>
+                            <a class="dropdown-item" href="#">Página inicial</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" data-toggle="modal" data-target="#sobre">Sobre</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- The Modal -->
+    <div class="modal fade" id="sobre">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Projeto de Soluções de Geoinformação</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                    Integrantes:<br> Marciano<br> Maurielle <br>Elias
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+
+                    <h6>Professora Luciene Stamato Delazari 2019-2</h6>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Fechar</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var map = L.map('map', {
+            zoomControl: true,
+            maxZoom: 28,
+            minZoom: 1
+        }).fitBounds([
+            [-25.576921576231197, -49.3311678208136],
+            [-25.490232996108052, -49.20264901465661]
+        ]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var bounds_group = new L.featureGroup([]);
+
+        function setBounds() {}
+
+        //OSM
+        var layer_OSMStandard_0 = L.tileLayer('http://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            opacity: 1.0,
+            attribution: '<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors, CC-BY-SA</a>',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 19
+        });
+        layer_OSMStandard_0;
+        map.addLayer(layer_OSMStandard_0);
+        // Satelite Google
+        var googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+        });
+
+
+
+
+        function pop_DivisadeBairros_2(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2"><strong>' + (feature.properties['TIPO'] !== null ? Autolinker.link(String(feature.properties['TIPO'])) : '') + '</strong></td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>Nome do Bairro: </strong><br />' + (feature.properties['NOME'] !== null ? Autolinker.link(String(feature.properties['NOME'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>Região: </strong><br />' + (feature.properties['NM_REGIONA'] !== null ? Autolinker.link(String(feature.properties['NM_REGIONA'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>Área m2: </strong><br />' + (feature.properties['SHAPE_AREA'] !== null ? Autolinker.link(String(feature.properties['SHAPE_AREA'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>Perímetro: </strong><br />' + (feature.properties['SHAPE_LEN'] !== null ? Autolinker.link(String(feature.properties['SHAPE_LEN'])) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {
+                maxHeight: 400
+            });
+        }
+
+        function style_DivisadeBairros_2_0() {
+            return {
+                pane: 'pane_DivisadeBairros_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(228,218,111,0.4)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_DivisadeBairros_2');
+        map.getPane('pane_DivisadeBairros_2').style.zIndex = 401;
+        map.getPane('pane_DivisadeBairros_2').style['mix-blend-mode'] = 'normal';
+        var layer_DivisadeBairros_2 = new L.geoJson(json_DivisadeBairros_2, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_DivisadeBairros_2',
+            layerName: 'layer_DivisadeBairros_2',
+            pane: 'pane_DivisadeBairros_2',
+            onEachFeature: pop_DivisadeBairros_2,
+            style: style_DivisadeBairros_2_0,
+        });
+        bounds_group.addLayer(layer_DivisadeBairros_2);
+
+        function pop_BaciadoRioPadilha_1(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2"><strong>Nome da Bacia: </strong><br />' + (feature.properties['NOME_BACIA'] !== null ? Autolinker.link(String(feature.properties['NOME_BACIA'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>Área km2: </strong><br />' + (feature.properties['SUB_AREA'] !== null ? Autolinker.link(String(feature.properties['SUB_AREA'])) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {
+                maxHeight: 400
+            });
+        }
+
+        function style_BaciadoRioPadilha_1_0() {
+            return {
+                pane: 'pane_BaciadoRioPadilha_1',
+                opacity: 1,
+                color: 'rgba(38,89,128,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(25,126,211,0.6039215686274509)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_BaciadoRioPadilha_1');
+        map.getPane('pane_BaciadoRioPadilha_1').style.zIndex = 402;
+        map.getPane('pane_BaciadoRioPadilha_1').style['mix-blend-mode'] = 'normal';
+        var layer_BaciadoRioPadilha_1 = new L.geoJson(json_BaciadoRioPadilha_1, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_BaciadoRioPadilha_1',
+            layerName: 'layer_BaciadoRioPadilha_1',
+            pane: 'pane_BaciadoRioPadilha_1',
+            onEachFeature: pop_BaciadoRioPadilha_1,
+            style: style_BaciadoRioPadilha_1_0,
+        });
+        bounds_group.addLayer(layer_BaciadoRioPadilha_1);
+
+
+
+        function pop_readeOcpIrreg_3(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2"><strong>Nome: </strong><br />' + (feature.properties['NOME'] !== null ? Autolinker.link(String(feature.properties['NOME'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>Categoria: </strong><br />' + (feature.properties['CATEGORIA'] !== null ? Autolinker.link(String(feature.properties['CATEGORIA'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>Bairro: </strong><br />' + (feature.properties['BAIRRO'] !== null ? Autolinker.link(String(feature.properties['BAIRRO'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>Região: </strong><br />' + (feature.properties['REGIONAL'] !== null ? Autolinker.link(String(feature.properties['REGIONAL'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>Área m2: </strong><br />' + (feature.properties['SHAPE_AREA'] !== null ? Autolinker.link(String(feature.properties['SHAPE_AREA'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>Perímetro: </strong><br />' + (feature.properties['SHAPE_LEN'] !== null ? Autolinker.link(String(feature.properties['SHAPE_LEN'])) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {
+                maxHeight: 400
+            });
+        }
+
+        function style_readeOcpIrreg_3_0() {
+            return {
+                pane: 'pane_readeOcpIrreg_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(243,166,178,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_readeOcpIrreg_3');
+        map.getPane('pane_readeOcpIrreg_3').style.zIndex = 403;
+        map.getPane('pane_readeOcpIrreg_3').style['mix-blend-mode'] = 'normal';
+        var layer_readeOcpIrreg_3 = new L.geoJson(json_readeOcpIrreg_3, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_readeOcpIrreg_3',
+            layerName: 'layer_readeOcpIrreg_3',
+            pane: 'pane_readeOcpIrreg_3',
+            onEachFeature: pop_readeOcpIrreg_3,
+            style: style_readeOcpIrreg_3_0,
+        });
+        bounds_group.addLayer(layer_readeOcpIrreg_3);
+
+
+        function style_AppRios30m_4_0() {
+            return {
+                pane: 'pane_AppRios30m_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,155,0,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_AppRios30m_4');
+        map.getPane('pane_AppRios30m_4').style.zIndex = 404;
+        map.getPane('pane_AppRios30m_4').style['mix-blend-mode'] = 'normal';
+        var layer_AppRios30m_4 = new L.geoJson(json_AppRios30m_4, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_AppRios30m_4',
+            layerName: 'layer_AppRios30m_4',
+            pane: 'pane_AppRios30m_4',
+            style: style_AppRios30m_4_0,
+        });
+        bounds_group.addLayer(layer_AppRios30m_4);
+
+
+
+        function style_Rios_5_0() {
+            return {
+                pane: 'pane_Rios_5',
+                opacity: 1,
+                color: 'rgba(39,96,162,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 2.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Rios_5');
+        map.getPane('pane_Rios_5').style.zIndex = 405;
+        map.getPane('pane_Rios_5').style['mix-blend-mode'] = 'normal';
+        var layer_Rios_5 = new L.geoJson(json_Rios_5, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Rios_5',
+            layerName: 'layer_Rios_5',
+            pane: 'pane_Rios_5',
+            style: style_Rios_5_0,
+        });
+        bounds_group.addLayer(layer_Rios_5);
+
+
+        function pop_reasdeConflito_6(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2"><strong>Nome Ocupação: </strong><br />' + (feature.properties['NOME'] !== null ? Autolinker.link(String(feature.properties['NOME'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>Categoria: </strong><br />' + (feature.properties['CATEGORIA'] !== null ? Autolinker.link(String(feature.properties['CATEGORIA'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>Bairro: </strong><br />' + (feature.properties['BAIRRO'] !== null ? Autolinker.link(String(feature.properties['BAIRRO'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>Região: </strong><br />' + (feature.properties['REGIONAL'] !== null ? Autolinker.link(String(feature.properties['REGIONAL'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>Área (m2): </strong><br />' + (feature.properties['SHAPE_AREA'] !== null ? Autolinker.link(String(feature.properties['SHAPE_AREA'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>Perímetro (m): </strong><br />' + (feature.properties['SHAPE_LEN'] !== null ? Autolinker.link(String(feature.properties['SHAPE_LEN'])) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {
+                maxHeight: 400
+            });
+        }
+
+        function style_reasdeConflito_6_0(feature) {
+            switch (String(feature.properties['CATEGORIA'])) {
+                case 'Assentamento Em Regularização':
+                    return {
+                        pane: 'pane_reasdeConflito_6',
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1.0,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(255,245,240,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case 'Assentamento Sem Regularização':
+                    return {
+                        pane: 'pane_reasdeConflito_6',
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1.0,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(252,164,135,1.0)',
+                        interactive: true,
+                    }
+                    break;
+                case 'Loteamento Clandestino Sem Regularização':
+                    return {
+                        pane: 'pane_reasdeConflito_6',
+                        opacity: 1,
+                        color: 'rgba(35,35,35,1.0)',
+                        dashArray: '',
+                        lineCap: 'butt',
+                        lineJoin: 'miter',
+                        weight: 1.0,
+                        fill: true,
+                        fillOpacity: 1,
+                        fillColor: 'rgba(235,54,42,1.0)',
+                        interactive: true,
+                    }
+                    break;
+            }
+        }
+        map.createPane('pane_reasdeConflito_6');
+        map.getPane('pane_reasdeConflito_6').style.zIndex = 406;
+        map.getPane('pane_reasdeConflito_6').style['mix-blend-mode'] = 'normal';
+        var layer_reasdeConflito_6 = new L.geoJson(json_reasdeConflito_6, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_reasdeConflito_6',
+            layerName: 'layer_reasdeConflito_6',
+            pane: 'pane_reasdeConflito_6',
+            onEachFeature: pop_reasdeConflito_6,
+            style: style_reasdeConflito_6_0,
+        });
+        bounds_group.addLayer(layer_reasdeConflito_6);
+
+        var baseMaps = {
+            '<img src="images/iconOSM.png" height="28" width="28"> <strong> OpenStreetMap </strong>': layer_OSMStandard_0,
+            '<img src="images/googleSatelite.jpg" height="28" width="28"> <strong> Google Satélite </strong>': googleSat,
+        };
+
+
+        map.addLayer(layer_DivisadeBairros_2);
+        map.addLayer(layer_BaciadoRioPadilha_1);
+        map.addLayer(layer_readeOcpIrreg_3);
+        map.addLayer(layer_AppRios30m_4);
+        map.addLayer(layer_Rios_5);
+        map.addLayer(layer_reasdeConflito_6);
+        // Verificar a Tela
+        var width = screen.width;
+        if (width <= 500)
+            var collap = true;
+        else
+            var collap = false;
+
+        L.control.layers(baseMaps, {
+            'Áreas de Conflito<br /><table><tr><td style="text-align: center;"><img src="legend/reasdeConflito_6_AssentamentoEmRegularização0.png" /></td><td>Assentamento Em Regularização</td></tr><tr><td style="text-align: center;"><img src="legend/reasdeConflito_6_AssentamentoSemRegularização1.png" /></td><td>Assentamento Sem Regularização</td></tr><tr><td style="text-align: center;"><img src="legend/reasdeConflito_6_LoteamentoClandestinoSemRegularização2.png" /></td><td>Loteamento Clandestino Sem Regularização</td></tr></table> <hr>': layer_reasdeConflito_6,
+            '<img src="legend/Rios_5.png" > Hidrografia': layer_Rios_5,
+            '<img src="legend/AppRios30m_4.png" /> App Rios 30m': layer_AppRios30m_4,
+            '<img src="legend/readeOcpIrreg_3.png" /> Áreas de Ocupação Irregular': layer_readeOcpIrreg_3,
+            '<img src="legend/BaciadoRioPadilha_1.png" /> Bacia do Rio Padilha': layer_BaciadoRioPadilha_1,
+            '<img src="legend/DivisadeBairros_2.png" /> Divisa de Bairros': layer_DivisadeBairros_2,
+
+
+        }, {
+            collapsed: collap
+        }).addTo(map);
+        setBounds();
+        map.addControl(new L.Control.Search({
+            layer: layer_DivisadeBairros_2,
+            initial: false,
+            hideMarkerOnCollapse: true,
+            propertyName: 'NOME'
+        }));
+        document.getElementsByClassName('search-button')[0].className +=
+            ' fa fa-binoculars';
+    </script>
+</body>
+
+</html>
