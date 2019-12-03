@@ -20,7 +20,7 @@ map.addLayer(markersLayer);
 for (i in data) {
     var title = data[i].title, //value searched
         loc = data[i].loc, //position found
-        marker = new L.Marker(new L.latLng(loc), { title: title }); //se property searched
+        marker = new L.Marker(new L.latLng(loc), { title: title, icon: redIcon }); //se property searched
     marker.bindPopup('<table><tr><td colspan="2"><strong>Tipo de conflito: </td></strong><td>' + title + '</td></tr></table>');
     markersLayer.addLayer(marker);
 }
